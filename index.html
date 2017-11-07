@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Do You Know Me?</title>
+	<link rel="stylesheet" type="text/css" href="css/style.css">
+	<link href="https://fonts.googleapis.com/css?family=Comfortaa" rel="stylesheet">
+	<link rel="icon" href="imagenes/favicon.ico" type="image/gif" sizes="16x16">
+</head>
+<body>
+<!-- Hola profe! en validación de formulario preferí hacer un quiz porque me parecia más divertido para la clase y también es una oportunidad de 
+que me conozcan mejor! :) -->
+
+<header id="header">
+	<nav class="navigation">
+    <div class="navbar-right">
+        <a href="#">About</a>
+        <a href="#">Blog</a>
+        <a href="#">Contact</a>
+    </div>
+    </nav>
+	<div class="title">
+		<h1 class="site-title">Do You<span class="small"> Know Me?</span></h1>
+	</div>
+	<div class="score">
+		<p id="score-counter">0</p>
+		<p class="points">Points</p>
+	</div>
+</header>
+
+<div id="content">
+	<div id="question-box"><p id="the-question"></p></div>
+	<div id="answer-box">
+		<ul>
+			<li class="answer">A: <span id="first-answer"></span></li>
+			<li class="answer">B: <span id="second-answer"></span></li>
+			<li class="answer">C: <span id="third-answer"></span></li>
+			<li class="answer">D: <span id="fourth-answer"></span></li>
+		</ul>
+	</div>
+</div>
+
+<div class="results-container">
+	<div class="results">
+		<h1>Congratulations!</h1>
+		<div class="result-text"><p>You've finished the quiz and the results are outstanding! Out of a total of <span id="num-total">0</span> questions, you've managed to answer <span id="num-correct">0</span> questions correctly, and you've only answered <span id="num-wrong">0</span> questions wrong!   If you have less than 5 correct answers, please do not talk to me again... hahaha Jk :) thanks for completing the quiz. </div>
+	</div>
+</div>
+
+<footer id="footer">
+	<p>Just a little quiz :)</p>
+</footer>
+<script>
+const NUMQUESTIONS = 10;
+
+let questionsMap = new Map();
+
+let quizSequence = [];
+
+let quizStats = {
+	counter: 0,
+	correct: 0,
+	wrong: 0,
+	currentQuestion: 0,
+};	
+
+// Aquí van las preguntas.
+function quizQuestions() {
+	questionsMap.set(1, {
+		question: "When i was born?",
+		a: "December 28, 1998.",
+		b: "June 28, 1998.",
+		c: "October 28, 1998.",
+		d: "April 28, 1998.",
+		answer: "a",
+	});
+	questionsMap.set(2, {
+		question: "Do i have a middle name?",
+		a: "Yes, Marie.",
+		b: "Yes, Inocencia.",
+		c: "Yes, Camile.",
+		d: "No, you don't.",
+		answer: "d",
+	});
+	questionsMap.set(3, {
+		question: "How many times did i broke my chin?",
+		a: "2.",
+		b: "7.",
+		c: "5.",
+		d: "4.",
+		answer: "b",
+	});
+	questionsMap.set(4, {
+		question: "What is my mom's name?",
+		a: "Felisa.",
+		b: "Maria.",
+		c: "Margarita.",
+		d: "Paola.",
+		answer: "a",
+	});
+	questionsMap.set(5, {
+		question: "What is my favorite color?",
+		a: "Pink.",
+		b: "Yellow.",
+		c: "Purple.",
+		d: "Orange.",
+		answer: "b",
+	});
+	questionsMap.set(6, {
+		question: "What is my favorite flower?",
+		a: "Roses.",
+		b: "Peonies.",
+		c: "Sunflowers.",
+		d: "Daisys.",
+		answer: "b",
+	});
+	questionsMap.set(7, {
+		question: "I have a crush on...",
+		a: "Emma Watson.",
+		b: "Harry Styles.",
+		c: "The Weeknd.",
+		d: "Dustin (Stranger Things).",
+		answer: "c",
+	});
+	questionsMap.set(8, {
+		question: "What is my favorite tv show?",
+		a: "The Nanny.",
+		b: "The Fresh Prince of Bel-Air.",
+		c: "The big bang theory.",
+		d: "Friends.",
+		answer: "d",
+	});
+	questionsMap.set(9, {
+		question: "Who is my favorite youtuber?",
+		a: "Connor Franta.",
+		b: "Yuya.",
+		c: "Around The Corner.",
+		d: "Good Mythical Morning.",
+		answer: "a",
+	});
+	questionsMap.set(10, {
+		question: "what thing I can not live with?",
+		a: "My Phone.",
+		b: "My Computer.",
+		c: "My Cat.",
+		d: "My bed.",
+		answer: "d",
+	});
+}
+
+let questionContainer = document.getElementById("the-question"),
+		answerA = document.getElementById("first-answer"),
+		answerB = document.getElementById("second-answer"),
+		answerC = document.getElementById("third-answer"),
+		answerD = document.getElementById("fourth-answer"),
+		scoreCounter = document.getElementById("score-counter");
+
+
+function determineSequence() {
+
+	for (let [key, value] of questionsMap) {
+		quizSequence.push(key);
+	}
+
+	function shuffle(array) {
+		let currentIndex = array.length,
+				temporaryValue,
+				randomIndex;
+
+		while (0 !== currentIndex) {
+
+			
+			randomIndex = Math.floor(Math.random() * currentIndex);
+			currentIndex -= 1;
+
+			temporaryValue = array[currentIndex];
+			array[currentIndex] = array[randomIndex];
+			array[randomIndex] = temporaryValue;
+		}
+		return array;
+		
+	}
+	
+	
+	quizSequence = shuffle(quizSequence);
+}
+
+// Get the next question.
+function getNextQuestion() {
+	// Up the counter.
+	quizStats.counter++;
+	
+	// Get the question number.
+	let qn = quizSequence.shift();
+	
+	// Set up the question and answers.
+	let a = questionsMap.get(qn).a,
+			b = questionsMap.get(qn).b,
+			c = questionsMap.get(qn).c,
+			d = questionsMap.get(qn).d,
+			question = questionsMap.get(qn).question;
+	
+	// Print the questions.
+	questionContainer.textContent = question;
+	answerA.textContent = a;
+	answerB.textContent = b;
+	answerC.textContent = c;
+	answerD.textContent = d;
+	
+	// Track the current question.
+	quizStats.currentQuestion = qn;
+}
+
+// Add event listeners.
+function addEventListeners() {
+	answerA.addEventListener("click", checkTheAnswer);
+	answerB.addEventListener("click", checkTheAnswer);
+	answerC.addEventListener("click", checkTheAnswer);
+	answerD.addEventListener("click", checkTheAnswer);
+}
+
+// Add data attributes.
+function addDataAttributes() {
+	answerA.setAttribute("data-answer", ( "a" ));
+	answerB.setAttribute("data-answer", ( "b" ));
+	answerC.setAttribute("data-answer", ( "c" ));
+	answerD.setAttribute("data-answer", ( "d" ));
+}
+
+// Check the answer.
+function checkTheAnswer() {
+	// Get the answers.
+	let givenAnswer = this.dataset.answer,
+			correctAnswer = questionsMap.get(quizStats.currentQuestion).answer;
+	
+	// Check given and correct answers.
+	if (givenAnswer === correctAnswer) {
+		quizStats.correct++;
+		this.classList.add("correct");
+	}
+	else {
+		quizStats.wrong++;
+		this.classList.add("wrong");
+	}
+	
+	// Update the counter.
+	scoreCounter.textContent = quizStats.correct;
+	
+	// Check if max num of questions has been reached.
+	if ( quizStats.counter < NUMQUESTIONS) {
+		setTimeout(clearClasses, 2000);
+		setTimeout(getNextQuestion, 2000);
+	}
+	// If so, stop the quiz.
+	else {
+		showTheResults();
+	}
+}
+
+// Clear classes.
+function clearClasses() {
+	answerA.classList.remove("correct", "wrong");
+	answerB.classList.remove("correct", "wrong");
+	answerC.classList.remove("correct", "wrong");
+	answerD.classList.remove("correct", "wrong");
+}
+
+// The results.
+function showTheResults() {
+	// Get the containers.
+	let numCorrect = document.getElementById("num-correct"),
+			numWrong = document.getElementById("num-wrong"),
+			numTotal = document.getElementById("num-total");
+	
+	// Get the results.
+	let correct = quizStats.correct,
+			wrong = quizStats.wrong,
+			total = NUMQUESTIONS;
+	
+	// Print the results.
+	numCorrect.textContent = correct;
+	numWrong.textContent = wrong;
+	numTotal.textContent = total;
+	
+	// Display the results.
+	document.getElementsByClassName("results-container")[0].classList.add("display");
+}
+
+//Let's start!
+(function startQuiz() {
+	// Init.
+	quizQuestions();
+	determineSequence();
+	getNextQuestion();
+	addEventListeners();
+	addDataAttributes();
+})();
+</script>
+<script type="js/script.js"></script>
+</body>
+</html>
